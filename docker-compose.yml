@@ -1,0 +1,36 @@
+version: '3.4'
+
+networks:
+  blogservicenetwork:
+
+services:
+  redis:
+    image: redis
+    container_name: my-redis
+    ports:
+      - "6379:6379"
+    networks:
+      - blogservicenetwork
+  blogserviceDB:
+    container_name: blogserviceDB
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    ports:
+     - 8002:1433
+    environment:
+     - ACCEPT_EULA=Y
+     - MSSQL_SA_PASSWORD=Nilesh@123
+    networks:
+     - blogservicenetwork
+  blogservice.api:
+    container_name: blogservice
+    ports:
+     - 8001:443
+    image: ${DOCKER_REGISTRY-}blogserviceapi
+    build:
+      context: .
+      dockerfile: BlogService.API/Dockerfile
+    depends_on:
+      - blogserviceDB
+      - redis
+    networks:
+      - blogservicenetwork
