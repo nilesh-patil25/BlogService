@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿using BlogService.Core;
+using BlogService.Core.AppSettings;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
@@ -6,9 +8,9 @@ namespace BlogService.API.Extensions
 {
     public static class AuthenticationServiceExtensions
     {
-        public static IServiceCollection AddJWTAuthenticationServices(this IServiceCollection services, IConfiguration config)
+        public static IServiceCollection AddJWTAuthenticationServices(this IServiceCollection services)
         {
-            var secretKey = config["JWT:Key"];
+            var secretKey = AppSettingsHelper.GetValue(ConfigConstants.JWTSecretKey);
 
             var key = Encoding.UTF8.GetBytes(secretKey);
 
@@ -25,8 +27,10 @@ namespace BlogService.API.Extensions
                 {
                     ValidateIssuerSigningKey = true,
                     IssuerSigningKey = new SymmetricSecurityKey(key),
-                    ValidateIssuer = false,
-                    ValidateAudience = false
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidIssuer = AppSettingsHelper.GetValue(ConfigConstants.JWTIssuer),
+                    ValidAudience = AppSettingsHelper.GetValue(ConfigConstants.JWTAudience)
                 };
             });
 

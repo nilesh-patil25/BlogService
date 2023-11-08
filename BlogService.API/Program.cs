@@ -1,5 +1,6 @@
 using BlogService.API.Extensions;
 using BlogService.API.Middlewares;
+using BlogService.Core.AppSettings;
 using BlogService.DataAccess.DbInitializer;
 
 namespace BlogService.API
@@ -9,6 +10,7 @@ namespace BlogService.API
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
+            AppSettingsHelper.AppSettingConfigure(builder.Configuration);
 
             // Add services to the container.
 
@@ -21,9 +23,10 @@ namespace BlogService.API
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
-            builder.Services.AddJWTAuthenticationServices(builder.Configuration);
+            builder.Services.AddJWTAuthenticationServices();
 
             var app = builder.Build();
+
 
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())

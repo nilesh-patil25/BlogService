@@ -1,4 +1,5 @@
-﻿using BlogService.Core.Services.Interfaces;
+﻿using BlogService.Core.AppSettings;
+using BlogService.Core.Services.Interfaces;
 using BlogService.DataAccess.Respositories.Interfaces;
 using BlogService.Models;
 using Microsoft.Extensions.Configuration;
@@ -12,13 +13,11 @@ namespace BlogService.Core.Services
 {
     public class UserService : IUserService
     {
-        private readonly IConfiguration _config;
         private readonly IUserRepository _userRepository;
 
-        public UserService(IConfiguration configuration, IUserRepository userRepository)
+        public UserService(IUserRepository userRepository)
         {
             _userRepository = userRepository;
-            _config = configuration;
         }
 
         public async Task<string> Login(string userName, string password)
@@ -30,19 +29,17 @@ namespace BlogService.Core.Services
                 return string.Empty;
             }
 
-            var tokenHandler = new JwtSecurityTokenHandler();
-
             var claims = new Claim[]
                 {
                     new Claim(ClaimTypes.Name, user.UserName),
                     new Claim(ClaimTypes.Role, user.Role)
                 };
 
-            var secretKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["JWT:Key"]));
+            var secretKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(AppSettingsHelper.GetValue(ConfigConstants.JWTSecretKey)));
             var signIn = new SigningCredentials(secretKey, SecurityAlgorithms.HmacSha256);
             var token = new JwtSecurityToken(
-                _config["JWT:Issuer"],
-                _config["JWT:Audience"],
+                AppSettingsHelper.GetValue(ConfigConstants.JWTIssuer),
+                AppSettingsHelper.GetValue(ConfigConstants.JWTAudience),
                 claims,
                 expires: DateTime.UtcNow.AddMinutes(10),
                 signingCredentials: signIn);

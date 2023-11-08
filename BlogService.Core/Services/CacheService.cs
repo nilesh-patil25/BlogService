@@ -1,4 +1,5 @@
-﻿using BlogService.Core.Services.Interfaces;
+﻿using BlogService.Core.AppSettings;
+using BlogService.Core.Services.Interfaces;
 using Microsoft.Extensions.Configuration;
 using StackExchange.Redis;
 using System.Text.Json;
@@ -8,12 +9,10 @@ namespace BlogService.Core.Services
     public class CacheService : ICacheService
     {
         private IDatabase _cacheDB;
-        private readonly IConfiguration _config;
 
-        public CacheService(IConfiguration config)
+        public CacheService()
         {
-            _config = config;
-            var redis = ConnectionMultiplexer.Connect(_config["CacheSettings:ConnectionString"]);
+            var redis = ConnectionMultiplexer.Connect(AppSettingsHelper.GetValue(ConfigConstants.CacheConnectionString));
             _cacheDB = redis.GetDatabase();
         }
         public async Task<T> GetDataAsync<T>(string key)

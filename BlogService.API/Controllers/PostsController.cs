@@ -18,6 +18,7 @@ namespace BlogService.API.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles ="admin")]
         public async Task<IActionResult> CreatePost([FromBody] BlogPostDTO postDTO)
         {
             try
