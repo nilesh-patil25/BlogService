@@ -1,12 +1,13 @@
 ﻿using BlogService.Core.Services.Interfaces;
 using BlogService.Shared.DTOs;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BlogService.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    // [Authorize(AuthenticationSchemes = "Bearer")]
+    [Authorize(AuthenticationSchemes = "Bearer")]
     public class PostsController : ControllerBase
     {
         private readonly IBlogPostService _blogPostService;
