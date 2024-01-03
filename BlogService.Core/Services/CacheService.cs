@@ -26,9 +26,18 @@ namespace BlogService.Core.Services
 
         public async Task<bool> SetDataAsync<T>(string key, T value, DateTimeOffset expirationTime)
         {
-            var expiryTime = expirationTime.DateTime.Subtract(DateTime.Now);
-            return await _cacheDB.StringSetAsync(key, JsonSerializer.Serialize(value), expiryTime);
+            try
+            {
+                var expiryTime = expirationTime.DateTime.Subtract(DateTime.Now);
+                return await _cacheDB.StringSetAsync(key, JsonSerializer.Serialize(value), expiryTime);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"An error occurred while setting data for key: {key}");
+                return false;
+            }
         }
+
 
         public async Task<object> RemoveDataAsync(string key)
         {
