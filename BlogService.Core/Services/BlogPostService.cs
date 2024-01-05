@@ -58,19 +58,29 @@ namespace BlogService.Core.Services
 
         public async Task<IEnumerable<BlogPost>> GetAllBlogsAsync(Expression<Func<BlogPost, bool>>? filter = null, string? includeProperties = null)
         {
-            string cacheKey = "allPosts";
-            var cachedData = await _cacheService.GetDataAsync<IEnumerable<BlogPost>>(cacheKey);
+            try
+            {
+                string cacheKey = "allPosts";
+                var cachedData = await _cacheService.GetDataAsync<IEnumerable<BlogPost>>(cacheKey);
 
-            if(cachedData != null)
-                return cachedData;
+                if (cachedData != null)
+                    return cachedData;
 
-            var allPosts = await _blogPostRepository.GetAllAsync(includeProperties : nameof(BlogPost.Comments));
-            var expiryTime = DateTimeOffset.Now.AddSeconds(60);
-            _cacheService.SetDataAsync(cacheKey, allPosts, expiryTime);
+                var allPosts = await _blogPostRepository.GetAllAsync(includeProperties: nameof(BlogPost.Comments));
+                var expiryTime = DateTimeOffset.Now.AddSeconds(60);
+                _cacheService.SetDataAsync(cacheKey, allPosts, expiryTime);
 
-            return allPosts;
-
+                return allPosts;
+            }
+            catch (Exception ex)
+            {
+                // Log the exception or handle it as needed
+                Console.Error.WriteLine($"Exception in GetAllBlogsAsync: {ex.Message}");
+                // You might want to rethrow the exception or return a specific error response based on your application's requirements
+                throw;
+            }
         }
+
 
 
     }
