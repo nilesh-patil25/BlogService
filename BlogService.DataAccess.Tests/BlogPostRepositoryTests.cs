@@ -69,12 +69,21 @@ namespace BlogService.DataAccess.Tests
             {
                 var repository = new BlogPostRepository(dbContext);
 
-                // Act
-                var result = await repository.FindByIdAsync(999); // Non-existent ID
+                try
+                {
+                    // Act
+                    var result = await repository.FindByIdAsync(999); // Non-existent ID
 
-                // Assert
-                Assert.IsNull(result);
+                    // Assert
+                    Assert.IsNull(result);
+                }
+                catch (Exception ex)
+                {
+                    // Log or handle the exception as needed
+                    Assert.Fail($"Unexpected exception: {ex.Message}");
+                }
             }
         }
+
     }
 }
